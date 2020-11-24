@@ -1,6 +1,8 @@
 import { Component, ElementRef, NgZone, ViewChild } from "@angular/core";
 import { Geolocation } from "@ionic-native/geolocation";
 import { LoadingController } from "ionic-angular";
+import { google } from "google-maps";
+declare var google: google;
 
 import {
   GoogleMapsEvent,
@@ -62,13 +64,6 @@ export class MapPage {
         console.log("Error getting location", error);
       });
 
-    // let marker = new google.maps.Marker({
-    //   position: results[0].geometry.location,
-    //   map: this.map,
-    // });
-    // this.markers.push(marker);
-
-    //Set latitude and longitude of some place
   }
 
   tryGeolocation() {
@@ -113,18 +108,20 @@ export class MapPage {
 
     this.geocoder.geocode({ placeId: item.place_id }, (results, status) => {
       if (status === "OK" && results[0]) {
-        console.log(results[0]);
         let position = {
           lat: results[0].geometry.location.lat,
           lng: results[0].geometry.location.lng,
         };
-        let marker = new google.maps.Marker({
-          position: results[0].geometry.location,
-          map: this.map,
+
+        this.map = new google.maps.Map(document.getElementById("map"), {
+          center: {
+            lat: results[0].geometry.location.lat(),
+            lng: results[0].geometry.location.lng(),
+          },
+          zoom: 15,
         });
-        // this.markers.push(marker);
         this.markPosition = { lat: position.lat(), lng: position.lng() };
-        this.addMaker(position.lat(), position.lng(), this.map, true);
+        this.addMaker(position.lat(), position.lng(), this.map, false);
       }
     });
   }
