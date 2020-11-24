@@ -4,10 +4,7 @@ import { LoadingController } from "ionic-angular";
 import { google } from "google-maps";
 declare var google: google;
 
-import {
-  GoogleMaps,
-  GoogleMap,
-} from "@ionic-native/google-maps";
+import { GoogleMaps, GoogleMap } from "@ionic-native/google-maps";
 
 @Component({
   selector: "page-map",
@@ -55,6 +52,7 @@ export class MapPage {
         this.map = new google.maps.Map(document.getElementById("map"), {
           center: { lat: resp.coords.latitude, lng: resp.coords.longitude },
           zoom: 15,
+          disableDefaultUI: true,
         });
 
         const marker = new google.maps.Marker({
@@ -85,7 +83,10 @@ export class MapPage {
     this.geolocation
       .getCurrentPosition()
       .then((resp) => {
-        this.moveMarkerAndSetCenterMarkerOnMap(resp.coords.latitude, resp.coords.longitude);
+        this.moveMarkerAndSetCenterMarkerOnMap(
+          resp.coords.latitude,
+          resp.coords.longitude
+        );
       })
       .catch((error) => {
         console.log("Error getting location", error);
@@ -136,12 +137,12 @@ export class MapPage {
   }
 
   moveMarkerAndSetCenterMarkerOnMap(lat, lng) {
-    this.marker.setPosition({ lat, lng});
+    this.marker.setPosition({ lat, lng });
     this.markPosition = { lat, lng };
     this.map.setCenter(this.markPosition);
   }
 
-  addListeners(marker: google.maps.Marker, map ) {
+  addListeners(marker: google.maps.Marker, map) {
     google.maps.event.addListener(marker, "dragend", function () {
       map.setCenter(this.markPosition);
     });
