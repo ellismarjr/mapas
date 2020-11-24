@@ -5,8 +5,6 @@ import { google } from "google-maps";
 declare var google: google;
 
 import {
-  GoogleMapsEvent,
-  GoogleMapOptions,
   GoogleMaps,
   GoogleMap,
 } from "@ionic-native/google-maps";
@@ -28,7 +26,7 @@ export class MapPage {
   loading: any;
   latitute: any;
   longitute: any;
-  marker: any;
+  marker: google.maps.Marker;
   markPosition: Object;
   @ViewChild("mapElement") mapNativeElement: ElementRef;
 
@@ -50,6 +48,7 @@ export class MapPage {
   }
 
   ionViewDidEnter() {
+    this.loading.present();
     this.geolocation
       .getCurrentPosition()
       .then((resp) => {
@@ -58,12 +57,27 @@ export class MapPage {
           zoom: 15,
         });
 
-        this.addMaker(resp.coords.latitude, resp.coords.longitude, this.map, false);
+        const marker = new google.maps.Marker({
+          position: { lat: resp.coords.latitude, lng: resp.coords.longitude },
+          map: this.map,
+          draggable: true,
+        });
+
+        this.marker = marker;
+
+        this.addListeners(this.marker, this.map);
+
+        this.loading.dismiss();
       })
       .catch((error) => {
         console.log("Error getting location", error);
       });
+  }
 
+  placeMarkerAndPanTo(latLng: google.maps.LatLng, map: google.maps.Map) {
+    this.clearMarkers();
+    this.marker.setPosition({ lat: latLng.lat(), lng: latLng.lng() });
+    this.map.panTo(latLng);
   }
 
   tryGeolocation() {
@@ -71,11 +85,7 @@ export class MapPage {
     this.geolocation
       .getCurrentPosition()
       .then((resp) => {
-        this.map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: resp.coords.latitude, lng: resp.coords.longitude },
-          zoom: 15,
-        });
-        this.addMaker(resp.coords.latitude, resp.coords.longitude, this.map, false);
+        this.moveMarkerAndSetCenterMarkerOnMap(resp.coords.latitude, resp.coords.longitude);
       })
       .catch((error) => {
         console.log("Error getting location", error);
@@ -105,7 +115,6 @@ export class MapPage {
   selectSearchResult(item) {
     this.clearMarkers();
     this.autocompleteItems = [];
-
     this.geocoder.geocode({ placeId: item.place_id }, (results, status) => {
       if (status === "OK" && results[0]) {
         let position = {
@@ -113,15 +122,7 @@ export class MapPage {
           lng: results[0].geometry.location.lng,
         };
 
-        this.map = new google.maps.Map(document.getElementById("map"), {
-          center: {
-            lat: results[0].geometry.location.lat(),
-            lng: results[0].geometry.location.lng(),
-          },
-          zoom: 15,
-        });
-        this.markPosition = { lat: position.lat(), lng: position.lng() };
-        this.addMaker(position.lat(), position.lng(), this.map, false);
+        this.moveMarkerAndSetCenterMarkerOnMap(position.lat(), position.lng());
       }
     });
   }
@@ -134,18 +135,19 @@ export class MapPage {
     this.markers = [];
   }
 
-  private addMaker(lat: number, lng: number, map, selected) {
-    if (selected) {
-      this.map.setCenter(this.markPosition);
-    }
-    const marker = new google.maps.Marker({
-      position: { lat, lng },
-      map,
-      draggable: true,
-    });
+  moveMarkerAndSetCenterMarkerOnMap(lat, lng) {
+    this.marker.setPosition({ lat, lng});
+    this.markPosition = { lat, lng };
+    this.map.setCenter(this.markPosition);
+  }
+
+  addListeners(marker: google.maps.Marker, map ) {
     google.maps.event.addListener(marker, "dragend", function () {
-      this.marker = marker;
-      this.map.setCenter(this.markPosition);
+      map.setCenter(this.markPosition);
+    });
+
+    this.map.addListener("click", (e) => {
+      this.placeMarkerAndPanTo(e.latLng, map);
     });
   }
 }
