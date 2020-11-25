@@ -54,17 +54,13 @@ export class MapPage {
           zoom: 15,
           disableDefaultUI: true,
         });
-
         const marker = new google.maps.Marker({
           position: { lat: resp.coords.latitude, lng: resp.coords.longitude },
           map: this.map,
           draggable: true,
         });
-
         this.marker = marker;
-
         this.addListeners(this.marker, this.map);
-
         this.loading.dismiss();
       })
       .catch((error) => {
@@ -122,7 +118,6 @@ export class MapPage {
           lat: results[0].geometry.location.lat,
           lng: results[0].geometry.location.lng,
         };
-
         this.moveMarkerAndSetCenterMarkerOnMap(position.lat(), position.lng());
       }
     });
@@ -146,7 +141,6 @@ export class MapPage {
     google.maps.event.addListener(marker, "dragend", function () {
       map.setCenter(this.markPosition);
     });
-
     this.map.addListener("click", (e) => {
       this.placeMarkerAndPanTo(e.latLng, map);
     });
