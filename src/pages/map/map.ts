@@ -60,10 +60,24 @@ export class MapPage {
         const marker = new google.maps.Marker({
           position: { lat: resp.coords.latitude, lng: resp.coords.longitude },
           map: this.map,
-          draggable: true,
+          draggable: false,
+
         });
         this.marker = marker;
-        this.addListeners(this.marker, this.map);
+        marker.bindTo('position', this.map, 'center');
+
+        this.map.addListener("center_changed", () => {
+          // 3 seconds after the center of the map has changed, pan back to the
+          // marker.
+
+
+          window.setTimeout(() => {
+            // this.map.panTo(marker.getPosition() as google.maps.LatLng);
+            console.log(marker.getPosition().lat());
+            console.log(marker.getPosition().lng());
+          }, 1000);
+        });
+
         this.loading.dismiss();
       })
       .catch((error) => {
@@ -149,10 +163,14 @@ export class MapPage {
 
   addListeners(marker: google.maps.Marker, map) {
     google.maps.event.addListener(marker, "dragend", function () {
-      map.setCenter(this.markPosition);
+      // map.setCenter(this.markPosition);
+      marker.setPosition(map.getCenter);
+      console.log(marker);
+
+
     });
-    this.map.addListener("click", (e) => {
-      this.placeMarkerAndPanTo(e.latLng);
-    });
+    // this.map.addListener("click", (e) => {
+    //   this.placeMarkerAndPanTo(e.latLng);
+    // });
   }
 }
