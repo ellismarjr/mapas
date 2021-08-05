@@ -8,6 +8,7 @@ import { Geolocation } from '@ionic-native/geolocation/';
 import { MapPage } from "../pages/map/map";
 import { TabsNavigationPage } from "../pages/tabs-navigation/tabs-navigation";
 import { PlacesPage } from "../pages/places/places";
+import { FirebaseAnalytics } from "@ionic-native/firebase-analytics";
 
 import { MyApp } from './app.component';
 
@@ -30,6 +31,7 @@ import { MyApp } from './app.component';
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     Geolocation,
+    FirebaseAnalytics
   ]
 })
 export class AppModule {}

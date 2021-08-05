@@ -5,6 +5,7 @@ import { google } from "google-maps";
 declare var google: google;
 
 import { GoogleMaps, GoogleMap } from "@ionic-native/google-maps";
+import { FirebaseAnalytics } from "@ionic-native/firebase-analytics";
 
 @Component({
   selector: "page-map",
@@ -30,7 +31,8 @@ export class MapPage {
   constructor(
     public zone: NgZone,
     private geolocation: Geolocation,
-    public loadingCtrl: LoadingController
+    public loadingCtrl: LoadingController,
+    private firebaseAnalytics: FirebaseAnalytics
   ) {
     this.geocoder = new google.maps.Geocoder();
     let elem = document.createElement("div");
@@ -42,6 +44,7 @@ export class MapPage {
     this.autocompleteItems = [];
     this.markers = [];
     this.loading = this.loadingCtrl.create();
+
   }
 
   ionViewDidEnter() {
@@ -68,7 +71,7 @@ export class MapPage {
       });
   }
 
-  placeMarkerAndPanTo(latLng: google.maps.LatLng, map: google.maps.Map) {
+  placeMarkerAndPanTo(latLng: google.maps.LatLng) {
     this.clearMarkers();
     this.marker.setPosition({ lat: latLng.lat(), lng: latLng.lng() });
     this.map.panTo(latLng);
@@ -76,6 +79,13 @@ export class MapPage {
 
   tryGeolocation() {
     this.clearMarkers();
+    this.firebaseAnalytics
+    .logEvent('select_content', {
+      content_type: 'image',
+      content_id: 'P12453',
+      items: [{ name: 'Kittens' }]
+    });
+
     this.geolocation
       .getCurrentPosition()
       .then((resp) => {
@@ -131,7 +141,7 @@ export class MapPage {
     this.markers = [];
   }
 
-  moveMarkerAndSetCenterMarkerOnMap(lat, lng) {
+  moveMarkerAndSetCenterMarkerOnMap(lat: number, lng: number) {
     this.marker.setPosition({ lat, lng });
     this.markPosition = { lat, lng };
     this.map.setCenter(this.markPosition);
@@ -142,7 +152,7 @@ export class MapPage {
       map.setCenter(this.markPosition);
     });
     this.map.addListener("click", (e) => {
-      this.placeMarkerAndPanTo(e.latLng, map);
+      this.placeMarkerAndPanTo(e.latLng);
     });
   }
 }

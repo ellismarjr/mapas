@@ -47,5 +47,30 @@
   <!-- The main bundle js is generated during the build process -->
   <script src="build/main.js"></script>
 
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-analytics.js"></script>
+<script async src="https://www.googletagmanager.com/gtag/js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  var firebaseConfig = {
+    apiKey: "AIzaSyANtJfWEzPBfIFFLHaCvJUUbhBUCAb3V3I",
+    authDomain: "ionic-test-89ec5.firebaseapp.com",
+    projectId: "ionic-test-89ec5",
+    storageBucket: "ionic-test-89ec5.appspot.com",
+    messagingSenderId: "192983000610",
+    appId: "1:192983000610:web:b10b8ee991b9aa75edcc7b",
+    measurementId: "G-WRYY66YH6B"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
+
 </body>
 </html>
